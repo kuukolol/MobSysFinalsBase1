@@ -1,46 +1,9 @@
 ﻿@inherits LayoutComponentBase
 <div class="page">
-    @*<div class="sidebar">
-        <NavMenu />
-    </div>*@ 
-
     <main>
-        <div class="topbar">
-            <span class="leftside">
-                <button id="btnMenu" class="btn text-primary" href="javascript:void(0)" onclick="toggleMenu()">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <button id="btnMenuClose" style="display:none" class="btn text-danger" href="javascript:void(0)" onclick="$('.mobile-nav').toggleClass('open');$('#btnMenu').toggle();$('#btnMenuClose').toggle()">
-                    <i class="fa fa-times"></i>
-                </button>
-            </span>
-
-            <span class="rightside">
-                <SectionOutlet SectionName="page-buttons" />                
-            </span>
-        </div>
         <NavMenu />
-        <article class="content px-4" onclick="hideMenu()" style="margin-top: 70px;">
+        <article class="content px-4" style="margin-top: 0px;">
             @Body
         </article>
     </main>
 </div>
-<script>
-    function toggleMenu() {
-        $('.mobile-nav').toggleClass('open');
-        $('#btnMenu').toggle();
-        $('#btnMenuClose').toggle();
-    }
-
-    function showMenu() {
-        $('.mobile-nav').addClass('open');
-        $('#btnMenu').hide();
-        $('#btnMenuClose').show();
-    }
-
-    function hideMenu() {
-        $('.mobile-nav').removeClass('open');
-        $('#btnMenu').show();
-        $('#btnMenuClose').hide();
-    }
-</script>

@@ -3,44 +3,60 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>MobSysFinalsBase1</title>
+    <title>Contacts</title>
     <base href="/" />
-    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="MobSysFinalsBase1.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="css/animate.min.css" />
-    <link rel="stylesheet" href="css/loading-icon.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes logo-pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .logo-pulse {
+            animation: logo-pulse 0.75s ease-in-out 2;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-white h-screen flex items-center justify-center">
 
-    <div class="status-bar-safe-area"></div>
-
-    <div id="app">
-        <div style="background-color:#FFF;height:100vh;text-align:center">
-            <!--<img src="imgs/loading.gif" style="width:50%;margin-top:25%"/>-->
-
-            <div class="loadingio-spinner-ball-nq4q5u6dq7r">
-                <div class="ldio-x2uulkbinbj">
-                    <div></div>
-                </div>
-            </div>
-            <h4>Loading...</h4>
-        </div>
+    <div id="splash-screen" class="flex flex-col items-center justify-center h-full">
+        <i class="fas fa-address-book text-[5rem] text-[#5865F2] logo-pulse"></i>
+        <div class="mt-100 text-3xl text-gray-800 font-semibold">Contacts</div>
     </div>
+
+    <div id="app" class="hidden"></div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                Blazor.start();
+            }, 2000);
+        });
+    </script>
+
     <script src="lib/fontawesome/js/all.min.js"></script>
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
 
 </body>
-
 </html>

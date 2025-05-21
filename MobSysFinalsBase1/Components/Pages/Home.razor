@@ -1,26 +1,28 @@
 ﻿@page "/"
-<SectionContent SectionName="page-buttons">
-    <div id="searchBox" class="input-group header-search" style="display:none;">
-        <span class="input-group-text text-warning"><i class="fa fa-search"></i></span>
-        <input id="txtSearch" type="text" class="form-control" placeholder="Search" value="@Model.Search" @onchange="SearchTerm" />
-        <span class="input-group-text" onclick="hideSearchBox()"><i class="fa fa-times"></i></span>
+
+<div class="relative w-screen min-h-screen bg-white flex flex-col">
+    <div class="px-4 pt-2 pb-1 bg-white z-10">
+        <h1 class="text-2xl font-bold text-gray-800 mt-0 mb-2">Contacts</h1>
+        <input class="w-full rounded-full bg-gray-100 px-4 py-2 text-sm outline-none border border-gray-200 focus:border-blue-400 transition"
+               placeholder="Search contacts"
+               type="text" />
+        <div class="flex items-center gap-2 text-gray-600 text-sm cursor-pointer select-none mt-2">
+            <i class="fas fa-user-plus text-gray-500 text-lg"></i>
+            <span>Create new contact</span>
+        </div>
     </div>
-    <span id="controlBox">
-        <button class="btn text-warning" onclick="showSearchBox()">
-            <i class="fa fa-search"></i>
-        </button>
-    </span>    
-</SectionContent>
-<section>
-    <h1>Welcome</h1>
-</section>
-<script>
-    function showSearchBox(){
-        $('#searchBox').show();
-        $('#controlBox').hide();
-    }
-    function hideSearchBox(){
-        $('#searchBox').hide();
-        $('#controlBox').show();
-    }
-</script>
+    <div class="flex-1 flex relative overflow-hidden">
+        <div class="flex-1 overflow-y-auto px-4 pb-20">
+            <ul class="divide-y divide-gray-100">
+            </ul>
+        </div>
+        <div class="absolute right-2 top-0 bottom-0 flex flex-col items-center justify-center z-10">
+            <div class="flex flex-col items-center text-xs text-gray-400 space-y-1 select-none overflow-y-auto py-2 h-full">
+                @foreach (var letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                {
+                    <a href="@($"#{letter}")" class="block w-5 h-5 flex items-center justify-center rounded hover:text-blue-600 transition">@letter</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
