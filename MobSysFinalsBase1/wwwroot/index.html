@@ -23,16 +23,18 @@
         }
 
         .logo-pulse {
-            animation: logo-pulse 0.75s ease-in-out 2;
+            animation: logo-pulse 0.75s ease-in-out 10;
         }
     </style>
 </head>
 
 <body class="bg-white h-screen flex items-center justify-center">
 
+    <div class="status-bar-safe-area"></div>
+
     <div id="splash-screen" class="flex flex-col items-center justify-center h-full">
         <i class="fas fa-address-book text-[5rem] text-[#5865F2] logo-pulse"></i>
-        <div class="mt-100 text-3xl text-gray-800 font-semibold">Contacts</div>
+        <div class="mt-80 text-3xl text-gray-800 font-semibold">My Contacts</div>
     </div>
 
     <div id="app" class="hidden"></div>
@@ -57,6 +59,7 @@
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
+
 
 </body>
 </html>
