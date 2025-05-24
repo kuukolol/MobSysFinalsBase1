@@ -8,6 +8,7 @@ namespace MobSysFinalsBase1
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+            builder.Services.AddBlazorBootstrap();
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -18,10 +19,9 @@ namespace MobSysFinalsBase1
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
-            builder.Services.AddSingleton<AppShellContext>();
             builder.Services.AddSingleton<DatabaseContext>();
             return builder.Build();
         }

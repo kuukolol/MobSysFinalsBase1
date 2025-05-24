@@ -1,20 +1,47 @@
 ﻿@page "/"
 
-<div class="relative w-screen min-h-screen bg-white flex flex-col">
-    <div class="px-4 pt-2 pb-1 bg-white z-10">
-        <h1 class="text-2xl font-bold text-gray-800 mt-0 mb-2">Contacts</h1>
-        <input class="w-full rounded-full bg-gray-100 px-4 py-2 text-sm outline-none border border-gray-200 focus:border-blue-400 transition"
+<div class="relative w-screen min-h-screen bg-white flex flex-col overflow-x-hidden">
+    <div class="px-4 pt-4 pb-2 bg-white z-10">
+        <input class="w-full rounded-full bg-gray-100 px-4 py-3 text-base outline-none border border-gray-200 focus:border-blue-400 transition"
                placeholder="Search contacts"
-               type="text" />
-        <div class="flex items-center gap-2 text-gray-600 text-sm cursor-pointer select-none mt-2">
-            <i class="fas fa-user-plus text-gray-500 text-lg"></i>
+               @bind="searchText"
+               @bind:event="oninput" />
+        <div class="flex items-center gap-2 text-gray-600 text-base cursor-pointer select-none mt-4 mb-2" @onclick="NavigateToAddContact">
+            <i class="fas fa-user-plus text-gray-500 text-xl"></i>
             <span>Create new contact</span>
         </div>
     </div>
     <div class="flex-1 flex relative overflow-hidden">
-        <div class="flex-1 overflow-y-auto px-4 pb-20">
-            <ul class="divide-y divide-gray-100">
-            </ul>
+        <div class="flex-1 overflow-y-auto overflow-x-hidden px-0 pb-20">
+            @if (groupedContacts.Any())
+            {
+                @foreach (var group in groupedContacts)
+                {
+                    <div>
+                        <div class="px-4 py-2 text-gray-400 font-semibold text-lg">@group.Key</div>
+                        @foreach (var contact in group)
+                        {
+                            <div class="flex items-center px-4 py-2">
+                                @if (!string.IsNullOrEmpty(contact.ProfilePicture))
+                                {
+                                    <img src="@GetImageSrc(contact.ProfilePicture)" class="w-10 h-10 rounded-full object-cover bg-gray-200" alt="Contact Avatar" />
+                                }
+                                else
+                                {
+                                    <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-gray-200 to-gray-300 text-xl font-bold text-white mr-3">
+                                        @GetInitial(contact)
+                                    </div>
+                                }
+                                <span class="ml-3 text-gray-900 text-base">@contactDisplayName(contact)</span>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="px-4 py-10 text-gray-400 text-center">No contacts found.</div>
+            }
         </div>
         <div class="absolute right-2 top-0 bottom-0 flex flex-col items-center justify-center z-10">
             <div class="flex flex-col items-center text-xs text-gray-400 space-y-1 select-none overflow-y-auto py-2 h-full">
