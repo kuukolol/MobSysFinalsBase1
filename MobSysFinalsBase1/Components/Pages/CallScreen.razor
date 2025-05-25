@@ -1,0 +1,37 @@
+﻿@page "/call-screen/{PhoneNumber}/{ContactName}"
+
+<div class="w-screen min-h-screen bg-gradient-to-b from-gray-800 to-black flex flex-col items-center justify-between pt-8 pb-6 px-4 app-container animate-fade-in text-white">
+    <div class="flex items-center w-full mb-6">
+        <button class="text-xl hover:text-gray-300 transition-colors" @onclick="EndCall" aria-label="End Call">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="text-xl font-semibold text-center flex-1">Active Call</h1>
+    </div>
+
+    <div class="flex flex-col items-center justify-center flex-1">
+        <div class="w-28 h-28 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-4xl mb-6 shadow-lg animate-pulse">
+            <i class="fas fa-phone-alt"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">@(ContactName == "unknown" ? "Unknown Caller" : ContactName)</h2>
+        <p class="text-lg font-mono mb-2">@FormattedPhoneNumber</p>
+        <p class="text-md text-gray-300">Call Duration: @CallDuration</p>
+    </div>
+
+    <div class="flex flex-row items-center justify-center gap-6 w-full max-w-md mt-6">
+        <button class="flex flex-col items-center justify-center bg-gray-700 bg-opacity-50 rounded-full w-14 h-14 text-xl hover:bg-opacity-70 transition-all duration-200"
+                @onclick="ToggleMute">
+            <i class="@(IsMuted ? "fas fa-microphone-slash" : "fas fa-microphone")"></i>
+            <span class="text-xs mt-1">@(IsMuted ? "Unmute" : "Mute")</span>
+        </button>
+        <button class="flex flex-col items-center justify-center bg-gray-700 bg-opacity-50 rounded-full w-14 h-14 text-xl hover:bg-opacity-70 transition-all duration-200"
+                @onclick="ToggleSpeaker">
+            <i class="@(IsSpeakerOn ? "fas fa-volume-up" : "fas fa-volume-down")"></i>
+            <span class="text-xs mt-1">Speaker</span>
+        </button>
+        <button class="flex flex-col items-center justify-center bg-red-500 rounded-full w-16 h-16 text-2xl hover:bg-red-600 transition-all duration-200 shadow-lg"
+                @onclick="EndCall">
+            <i class="fas fa-phone-slash"></i>
+            <span class="text-xs mt-1">End</span>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+﻿@page "/edit-contact/{ContactId:int}"
+
+<div class="relative w-screen min-h-screen bg-white flex flex-col overflow-x-hidden app-container animate-container">
+    <div class="px-4 pt-6 pb-1 bg-white z-10">
+        <div class="flex items-center justify-between mb-6">
+            <button class="text-2xl text-gray-500" @onclick="Cancel" aria-label="Close">
+                &times;
+            </button>
+            <button class="bg-gray-700 text-white px-5 py-2 rounded-full font-semibold" type="submit" form="contactForm">Save</button>
+        </div>
+        <div class="mb-2">
+            <h1 class="text-xl font-semibold text-gray-800 text-center" style="margin-top:-5rem;">Edit Contact</h1>
+        </div>
+
+        <div class="flex flex-col items-center mb-6">
+            <InputFile id="profilePicInput"
+                       style="display: none;"
+                       OnChange="@HandleFileSelected"
+                       accept="image/jpeg,image/png,image/jpg" />
+
+            <label for="profilePicInput" class="cursor-pointer">
+                <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-2 overflow-hidden hover:bg-gray-300 transition relative">
+                    @if (!string.IsNullOrEmpty(SelectedImagePath) && System.IO.File.Exists(SelectedImagePath))
+                    {
+                        <img src="@GetImageSrc(SelectedImagePath)" alt="Profile" class="w-full h-full object-cover" />
+                    }
+                    else if (!string.IsNullOrEmpty(Contact?.ProfilePicture) && System.IO.File.Exists(Contact.ProfilePicture))
+                    {
+                        <img src="@GetImageSrc(Contact.ProfilePicture)" alt="Profile" class="w-full h-full object-cover" />
+                    }
+                    else
+                    {
+                        <img src="imgs/upload_photo.png" alt="Add picture"
+                             style="width: 50%; height: 50%; object-fit: cover; border-radius: 9999px;" />
+                    }
+                </div>
+            </label>
+            <span class="text-gray-500 text-sm">Change picture</span>
+            @if (!string.IsNullOrEmpty(UploadErrorMessage))
+            {
+                <p class="text-red-500 text-xs mt-1">@UploadErrorMessage</p>
+            }
+        </div>
+
+        <EditForm id="contactForm" Model="@Contact" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="space-y-4">
+                <div>
+                    <InputText class="w-full rounded bg-gray-100 px-4 py-3 text-base outline-none border border-gray-200 focus:border-blue-400 transition"
+                               @bind-Value="Contact.FirstName" placeholder="First name" />
+                    <ValidationMessage For="@(() => Contact.FirstName)" class="text-red-500 text-xs mt-1" />
+                </div>
+                <div>
+                    <InputText class="w-full rounded bg-gray-100 px-4 py-3 text-base outline-none border border-gray-200 focus:border-blue-400 transition"
+                               @bind-Value="Contact.Surname" placeholder="Surname" />
+                    <ValidationMessage For="@(() => Contact.Surname)" class="text-red-500 text-xs mt-1" />
+                </div>
+                <div class="flex items-center">
+                    <span class="inline-block px-3 py-2 bg-gray-100 border border-gray-200 rounded-l text-gray-700 text-base">+63</span>
+                    <InputText class="flex-1 rounded-r bg-gray-100 px-4 py-3 text-base outline-none border-t border-b border-r border-gray-200 focus:border-blue-400 transition"
+                               @bind-Value="Contact.PhoneNumber" placeholder="Phone number" type="tel" />
+                    <ValidationMessage For="@(() => Contact.PhoneNumber)" class="text-red-500 text-xs mt-1" />
+                </div>
+                <div>
+                    <InputText class="w-full rounded bg-gray-100 px-4 py-3 text-base outline-none border border-gray-200 focus:border-blue-400 transition"
+                               @bind-Value="Contact.Email" placeholder="Email" />
+                    <ValidationMessage For="@(() => Contact.Email)" class="text-red-500 text-xs mt-1" />
+                </div>
+                <div>
+                    <InputText class="w-full rounded bg-gray-100 px-4 py-3 text-base outline-none border border-gray-200 focus:border-blue-400 transition"
+                               @bind-Value="Contact.Nickname" placeholder="Nickname" />
+                    <ValidationMessage For="@(() => Contact.Nickname)" class="text-red-500 text-xs mt-1" />
+                </div>
+                @if (!string.IsNullOrEmpty(DatabaseErrorMessage))
+                {
+                    <div class="mt-2 p-2 bg-red-100 text-red-700 text-sm rounded">
+                        @DatabaseErrorMessage
+                    </div>
+                }
+            </div>
+        </EditForm>
+    </div>
+</div>

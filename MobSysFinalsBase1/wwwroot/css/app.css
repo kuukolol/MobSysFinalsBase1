@@ -1,8 +1,196 @@
-﻿html, body {
+﻿.app-container {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    max-width: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 9999px;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+input {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.search-input {
+    border: 1px solid #ddd !important;
+}
+
+input[type="text"] {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.create-contact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    color: #444;
+    cursor: pointer;
+}
+
+    .create-contact i {
+        font-size: 1.25rem;
+    }
+
+.content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+}
+
+.contact-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1rem 6rem 1rem;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.group {
+    margin-bottom: 1rem;
+}
+
+.group-title {
+    font-weight: bold;
+    color: #999;
+    margin: 0.5rem 0;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    object-fit: cover;
+    background-color: #ddd;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom right, #ccc, #eee);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    margin-right: 0.75rem;
+}
+
+.contact-name {
+    margin-left: 0.75rem;
+    font-size: 1rem;
+    color: #222;
+}
+
+.alphabet-nav {
+    position: absolute;
+    top: -50px;
+    bottom: 0;
+    right: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 5;
+}
+
+    .alphabet-nav a {
+        font-size: 0.70rem;
+        color: #aaa;
+        margin: 0.10rem 0;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .alphabet-nav a:hover {
+            color: #007bff;
+        }
+
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #22c55e;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    animation: fadeInOut 1.8s;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -16px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -16px);
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
     overflow-x: hidden !important;
     width: 100vw;
     max-width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     padding: 0;
     touch-action: pan-y;
@@ -10,15 +198,6 @@
     user-select: none;
     background-color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: transparent;
 }
 
 #splash-screen {
@@ -47,4 +226,30 @@
         font-weight: 600;
     }
 
-*/
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.search-box, .search-container, input[type="text"] {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

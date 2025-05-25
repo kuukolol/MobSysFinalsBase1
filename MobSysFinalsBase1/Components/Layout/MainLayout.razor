@@ -1,10 +1,37 @@
 ﻿@inherits LayoutComponentBase
+
 <div class="page">
     <main>
-        <NavMenu />
+        @if (!IsCallScreen())
+        {
+            <NavMenu />
+        }
         <article class="content px-4" style="margin-top: 0px;">
             @Body
         </article>
     </main>
 </div>
-    <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.MiddleCenter" />
+
+@inject NavigationManager Nav
+
+@if (!IsCallScreen())
+{
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-14 z-20">
+        <NavLink class="flex flex-col items-center justify-center text-xs text-gray-500 active:text-blue-600" href="/favourites" Match="NavLinkMatch.Prefix">
+            <i class="fas fa-star text-lg mb-1"></i>
+            Favourites
+        </NavLink>
+        <NavLink class="flex flex-col items-center justify-center text-xs text-gray-500 active:text-blue-600" href="/" Match="NavLinkMatch.All">
+            <i class="fas fa-address-book text-lg mb-1"></i>
+            Contacts
+        </NavLink>
+    </div>
+}
+
+@code {
+    private bool IsCallScreen()
+    {
+        var currentUri = Nav.Uri;
+        return currentUri.Contains("/call-screen/");
+    }
+}

@@ -7,7 +7,6 @@
     <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/blazor.css" />
-
     <link rel="stylesheet" href="MobSysFinalsBase1.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="lib/fontawesome/css/all.min.css" />
@@ -27,41 +26,66 @@
         .logo-pulse {
             animation: logo-pulse 0.75s ease-in-out 10;
         }
+
+        .hidden-preload {
+            display: none;
+        }
     </style>
 </head>
-
 <body class="bg-white h-screen flex items-center justify-center">
-
     <div class="status-bar-safe-area"></div>
-
     <div id="splash-screen" class="flex flex-col items-center justify-center h-full">
         <i class="fas fa-address-book text-[5rem] text-[#5865F2] logo-pulse"></i>
-        <div class="mt-80 text-3xl text-gray-800 font-semibold">My Contacts</div>
+        <div class="mt-60 text-3xl text-gray-800 font-semibold">My Contacts</div>
     </div>
-
     <div id="app" class="hidden"></div>
-
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-
+    <div id="preload-images" class="hidden-preload"></div>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
+            const countryCodes = [
+                'af', 'ax', 'al', 'dz', 'as', 'ad', 'ao', 'ai', 'aq', 'ag', 'ar', 'am', 'aw', 'au', 'at', 'az',
+                'bs', 'bh', 'bd', 'bb', 'by', 'be', 'bz', 'bj', 'bm', 'bt', 'bo', 'ba', 'bw', 'bv', 'br', 'io',
+                'bn', 'bg', 'bf', 'bi', 'kh', 'cm', 'ca', 'cv', 'ky', 'cf', 'td', 'cl', 'cn', 'cx', 'cc', 'co',
+                'km', 'cg', 'cd', 'ck', 'cr', 'ci', 'hr', 'cu', 'cy', 'cz', 'dk', 'dj', 'dm', 'do', 'ec', 'eg',
+                'sv', 'gq', 'er', 'ee', 'et', 'fk', 'fo', 'fj', 'fi', 'fr', 'gf', 'pf', 'tf', 'ga', 'gm', 'ge',
+                'de', 'gh', 'gi', 'gr', 'gl', 'gd', 'gp', 'gu', 'gt', 'gg', 'gn', 'gw', 'gy', 'ht', 'hm', 'va',
+                'hn', 'hk', 'hu', 'is', 'in', 'id', 'ir', 'iq', 'ie', 'im', 'il', 'it', 'jm', 'jp', 'je', 'jo',
+                'kz', 'ke', 'ki', 'kp', 'kr', 'xk', 'kw', 'kg', 'la', 'lv', 'lb', 'ls', 'lr', 'ly', 'li', 'lt',
+                'lu', 'mo', 'mk', 'mg', 'mw', 'my', 'mv', 'ml', 'mt', 'mh', 'mq', 'mr', 'mu', 'yt', 'mx', 'fm',
+                'md', 'mc', 'mn', 'me', 'ms', 'ma', 'mz', 'mm', 'na', 'nr', 'np', 'nl', 'an', 'nc', 'nz', 'ni',
+                'ne', 'ng', 'nu', 'nf', 'mp', 'no', 'om', 'pk', 'pw', 'ps', 'pa', 'pg', 'py', 'pe', 'ph', 'pn',
+                'pl', 'pt', 'pr', 'qa', 're', 'ro', 'ru', 'rw', 'bl', 'sh', 'kn', 'lc', 'mf', 'pm', 'vc', 'ws',
+                'sm', 'st', 'sa', 'sn', 'rs', 'sc', 'sl', 'sg', 'sk', 'si', 'sb', 'so', 'za', 'gs', 'ss', 'es',
+                'lk', 'sd', 'sr', 'sj', 'sz', 'se', 'ch', 'sy', 'tw', 'tj', 'tz', 'th', 'tl', 'tg', 'tk', 'to',
+                'tt', 'tn', 'tr', 'tm', 'tc', 'tv', 'ug', 'ua', 'ae', 'gb', 'us', 'um', 'uy', 'uz', 'vu', 've',
+                'vn', 'vg', 'vi', 'wf', 'eh', 'ye', 'zm', 'zw'
+            ];
+
+            const preloadContainer = document.getElementById('preload-images');
+            countryCodes.forEach(code => {
+                const img = new Image();
+                img.src = `imgs/flags/${code}.svg`;
+                img.alt = `preload-${code}`;
+                img.style.display = 'none';
+                preloadContainer.appendChild(img);
+            });
+
             setTimeout(() => {
                 document.getElementById('splash-screen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
                 Blazor.start();
-            }, 2000);
+            }, 5000);
         });
     </script>
-
     <script src="lib/fontawesome/js/all.min.js"></script>
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
-
-
+    <!--<script src="js/app.js"></script>-->
 </body>
 </html>

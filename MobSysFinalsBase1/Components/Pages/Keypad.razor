@@ -1,0 +1,47 @@
+﻿@page "/keypad"
+
+<div class="w-screen min-h-screen bg-white flex flex-col pt-6 px-4 app-container animate-container">
+    <div class="flex items-center w-full mb-6">
+        <button class="text-2xl text-gray-400 hover:text-gray-600 transition-colors" @onclick="GoBack" aria-label="Back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="text-xl font-semibold text-gray-800 text-center flex-1">Dial Number</h1>
+    </div>
+
+    <div class="flex flex-col items-center mb-6">
+        <div class="w-full max-w-md bg-gray-100 rounded-xl py-3 px-4 text-center shadow-sm border border-gray-200 mb-4">
+            <span class="text-2xl font-mono font-semibold text-gray-900">@DialedNumber</span>
+            @if (string.IsNullOrEmpty(DialedNumber))
+            {
+                <span class="text-lg text-gray-500">Enter number to call</span>
+            }
+        </div>
+        <button class="w-12 h-12 text-gray-600 text-lg hover:text-gray-800 transition-colors" @onclick="ClearNumber" disabled="@(string.IsNullOrEmpty(DialedNumber))">
+            <i class="fas fa-backspace"></i>
+        </button>
+    </div>
+
+    <div class="flex flex-col items-center w-full max-w-md mx-auto mb-6">
+        <div class="grid grid-cols-3 gap-4 w-full">
+            @foreach (var key in KeypadKeys)
+            {
+                <button class="w-full h-16 bg-gray-50 rounded-full text-xl font-semibold text-gray-800 hover:bg-gray-200 transition-all duration-200 shadow-sm"
+                        @onclick="@(() => DialKey(key))">
+                    @key
+                    @if (key == "0")
+                    {
+                        <span class="text-xs block text-gray-500">+</span>
+                    }
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="flex justify-center w-full max-w-md mx-auto">
+        <button class="bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full w-20 h-20 text-2xl shadow-lg hover:from-green-500 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                @onclick="InitiateCall"
+                disabled="@(string.IsNullOrEmpty(DialedNumber))">
+            <i class="fas fa-phone-alt"></i>
+        </button>
+    </div>
+</div>

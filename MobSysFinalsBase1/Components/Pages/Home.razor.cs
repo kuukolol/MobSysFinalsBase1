@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MobSysFinalsBase1.Shared;
 using MobSysFinalsBase1.Models;
-using BlazorBootstrap;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,54 +18,49 @@ namespace MobSysFinalsBase1.Components.Pages
         [Inject]
         public DatabaseContext DB { get; set; }
 
-        [Inject] protected ToastService ToastService { get; set; } = default!;
-
         private List<User> contacts = new();
         private string searchText = "";
+        private string selectedLetter = "";
+        protected bool ShowToast { get; set; } = false;
+        protected string ToastMessage { get; set; } = "";
 
         private IEnumerable<IGrouping<string, User>> groupedContacts =>
             contacts
                 .Where(c => string.IsNullOrWhiteSpace(searchText) ||
                             contactDisplayName(c).Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .Where(c => string.IsNullOrWhiteSpace(selectedLetter) ||
+                            contactDisplayName(c).StartsWith(selectedLetter, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(c => contactDisplayName(c))
                 .GroupBy(c => contactDisplayName(c).Substring(0, 1).ToUpper());
 
         protected override async Task OnInitializedAsync()
         {
+            Debug.WriteLine("[Home] OnInitializedAsync started.");
             if (DB != null)
             {
                 await DB.Init();
+                Debug.WriteLine("[Home] Database initialized.");
             }
             await LoadContacts();
             var uri = new Uri(Nav.Uri);
             Debug.WriteLine($"[Home] Current URI: {uri}");
-            if (uri.Query.Contains("success=true"))
+            if (uri.Query.Contains("success=true&mode=create"))
             {
                 Debug.WriteLine("[Home] success=true query parameter detected.");
-                try
-                {
-                    
-                    ToastService.Notify(new(ToastType.Success, $"Contact created successfully! 🎉"));
-                    Debug.WriteLine("[Home] Toast notification triggered.");
-                }
-                catch (Exception ex)
-                {
-                    ToastService.Notify(new(ToastType.Danger, $"Error: {ex.Message}."));
-                    Debug.WriteLine($"[Home] Failed to show toast: {ex.Message}");
-                }
+                ShowToastMessage("Contact created successfully! 🎉");
                 Nav.NavigateTo("/", false);
+                Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
+            }
+            else if (uri.Query.Contains("success=true&mode=edit"))
+            {
+                Debug.WriteLine("[Home] success=true query parameter detected.");
+                ShowToastMessage("Contact updated successfully! 🎉");
+                Nav.NavigateTo("/", false);
+                Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
             }
             else
             {
                 Debug.WriteLine("[Home] No success=true query parameter found in URI.");
-            }
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (!firstRender)
-            {
-                await LoadContacts();
             }
         }
 
@@ -76,12 +70,58 @@ namespace MobSysFinalsBase1.Components.Pages
             {
                 contacts = await DB.Users();
                 StateHasChanged();
+                Debug.WriteLine("[Home] Contacts loaded and StateHasChanged called.");
             }
         }
 
         private void NavigateToAddContact()
         {
             Nav.NavigateTo("/add-contact");
+            Debug.WriteLine("[Home] Navigated to /add-contact.");
+        }
+
+        private async void ShowToastMessage(string message)
+        {
+            try
+            {
+                ToastMessage = message;
+                ShowToast = true;
+                Debug.WriteLine($"[Home] Toast shown with message: {message}");
+                StateHasChanged();
+                Debug.WriteLine("[Home] StateHasChanged called after showing toast.");
+                await Task.Delay(1800);
+                ShowToast = false;
+                StateHasChanged();
+                Debug.WriteLine("[Home] Toast auto-hidden after delay.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Home] Failed to show toast: {ex.Message}");
+            }
+        }
+
+        private string SearchText
+        {
+            get => searchText;
+            set
+            {
+                searchText = value;
+                Debug.WriteLine($"[Home] Search text updated to: {searchText}");
+                StateHasChanged();
+            }
+        }
+
+        private void FilterByLetter(string letter)
+        {
+            if (selectedLetter == letter)
+            {
+                selectedLetter = "";
+            }
+            else
+            {
+                selectedLetter = letter;
+            }
+            StateHasChanged();
         }
 
         private string GetInitial(User user)
@@ -131,5 +171,12 @@ namespace MobSysFinalsBase1.Components.Pages
             int fallbackAvatarNum = randFallback.Next(1, 5);
             return $"images/default_avatar_{fallbackAvatarNum}.jpg";
         }
+
+        private void NavigateToContactDetail(int contactId)
+        {
+            Nav.NavigateTo($"/contact/{contactId}");
+            Debug.WriteLine($"[Home] Navigated to contact detail: ID={contactId}");
+        }
+
     }
 }

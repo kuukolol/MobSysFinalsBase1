@@ -1,22 +1,59 @@
 ﻿@page "/favourites"
 
-<div class="w-screen min-h-screen bg-white flex flex-col pb-16">
-    <div class="px-4 pt-2 pb-1 bg-white z-10">
-        <h1 class="text-2xl font-bold text-gray-800 mt-0 mb-2">Favourites</h1>
-        <div class="flex items-center bg-gray-100 rounded-full px-4 py-2">
-            <i class="fas fa-search text-gray-400 mr-2"></i>
-            <input class="flex-1 bg-transparent outline-none text-sm"
-                   placeholder="Search contacts"
-                   type="text"
-                   disabled />
-            <i class="fas fa-ellipsis-v text-gray-400 ml-2"></i>
-        </div>
+<div class="app-container animate-container">
+    @if (ShowToast)
+    {
+            <div class="toast">@ToastMessage</div>
+    }
+
+    <div class="header">
+        <input class="search-input"
+               placeholder="Search favourites"
+               @bind="searchText"
+               @bind:event="oninput" />
     </div>
 
-    <div class="flex items-center justify-between px-4 pt-2 pb-1">
-        <span class="text-sm font-semibold text-gray-700">Favourites</span>
-        <button class="text-blue-600 text-sm font-semibold focus:outline-none">Add</button>
-    </div>
-    <div class="px-4 pt-2">
+    <div class="content">
+        <div class="contact-list">
+            @if (groupedFavouriteContacts.Any())
+            {
+                @foreach (var group in groupedFavouriteContacts)
+                {
+                            <div class="group">
+                                <div class="group-title">@group.Key</div>
+                        @foreach (var contact in group)
+                        {
+                                        <div class="contact-item" @onclick="() => NavigateToContactDetail(contact.ID)" style="cursor: pointer;">
+                                @if (!string.IsNullOrEmpty(contact.ProfilePicture) && System.IO.File.Exists(contact.ProfilePicture))
+                                {
+                                                    <img src="@GetImageSrc(contact.ProfilePicture)" class="avatar" />
+                                }
+                                else
+                                {
+                                                    <div class="avatar-placeholder">@GetInitial(contact)</div>
+                                }
+                                            <span class="contact-name">@DisplayName(contact)</span>
+                                            <i class="@GetStarIconClass(contact)" style="color: @GetStarColor(contact) !important; margin-left: 8px;"></i>
+                                        </div>
+                        }
+                            </div>
+                }
+            }
+            else
+            {
+                    <div class="no-contacts">No favourite contacts found.</div>
+            }
+        </div>
+
+        <div class="alphabet-nav">
+            @foreach (var letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            {
+                string currentLetter = letter.ToString();
+                    <a href="javascript:void(0)"
+                       @onclick="() => FilterByLetter(currentLetter)"
+                       style="@(selectedLetter == currentLetter ? "color: #007bff;" : "")">@letter</a>
+            }
+        </div>
     </div>
 </div>
+
