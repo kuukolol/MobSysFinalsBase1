@@ -46,6 +46,7 @@
 
 	<ItemGroup>
 	  <None Remove="Platforms\Android\Resources\layout\call_overlay.xml" />
+	  <None Remove="Platforms\Android\Resources\layout\incall_activity.xml" />
 	</ItemGroup>
 
 	<ItemGroup>

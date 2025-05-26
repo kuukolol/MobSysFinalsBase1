@@ -9,6 +9,7 @@ using Android.App;
 using Android.Content;
 using Java.Lang;
 using MobSysFinalsBase1.Platforms.Android.Services;
+using Android.Telecom;
 #endif
 
 namespace MobSysFinalsBase1.Components.Pages
@@ -45,7 +46,9 @@ namespace MobSysFinalsBase1.Components.Pages
             _ringingTimeoutTimer.Start();
 
             FormatPhoneNumber();
-            //await JS.InvokeVoidAsync("playRingingSound");
+#if ANDROID
+            MyInCallService.CallStateChanged += OnCallStateChanged;
+#endif
             await InitiateCall();
         }
 
@@ -69,20 +72,10 @@ namespace MobSysFinalsBase1.Components.Pages
         {
             try
             {
-#if ANDROID
-                var ctx = Android.App.Application.Context;
-                if (Android.Provider.Settings.CanDrawOverlays(ctx))
-                {
-                    var overlayIntent = new Intent(ctx, Class.FromType(typeof(CallOverlayService)));
-                    ctx.StartService(overlayIntent);
-                }
-#endif
-
                 DialerPlatform.PlaceCall(FormattedPhoneNumber);
             }
             catch
             {
-                //await JS.InvokeVoidAsync("stopRingingSound");
                 Nav.NavigateTo("/");
             }
         }
@@ -108,10 +101,8 @@ namespace MobSysFinalsBase1.Components.Pages
                 {
                     InvokeAsync(async () =>
                     {
-                        await JS.InvokeVoidAsync("stopRingingSound");
                         _isCallConnected = false;
                         _ringingTimeoutTimer.Stop();
-                        StopOverlay();
                         Nav.NavigateTo("/");
                     });
                 }
@@ -121,45 +112,73 @@ namespace MobSysFinalsBase1.Components.Pages
                 _ringingTimeoutTimer.Stop();
             }
         }
+        
+        #if ANDROID
 
-        private void ToggleMute()
+
+private void OnCallStateChanged(object sender, CallState state)
+    {
+        InvokeAsync(() =>
         {
+            switch (state)
+            {
+                case CallState.Active:
+                    _isCallConnected = true;
+                    _isCallAnswered = true;
+                    break;
+                case CallState.Disconnected:
+                    _isCallConnected = false;
+                    break;
+                case CallState.Ringing:
+                    _isCallConnected = true;
+                    break;
+                case CallState.Dialing:
+                    _isCallConnected = true;
+                    break;
+            }
+            StateHasChanged();
+        });
+    }
+#endif
+
+
+    private void ToggleMute()
+        {
+#if ANDROID
+            MyInCallService.Instance?.MuteCall(!IsMuted);
             IsMuted = !IsMuted;
             StateHasChanged();
+#endif
         }
 
         private void ToggleSpeaker()
         {
+#if ANDROID
             IsSpeakerOn = !IsSpeakerOn;
+            MyInCallService.Instance?.ToggleSpeakerphone(IsSpeakerOn);
             StateHasChanged();
+#endif
         }
 
         private async Task EndCall()
         {
             _callDurationTimer?.Stop();
             _ringingTimeoutTimer?.Stop();
-            //await JS.InvokeVoidAsync("stopRingingSound");
-            StopOverlay();
+#if ANDROID
+            MyInCallService.Instance?.DisconnectCall();
+#endif
             _isCallConnected = false;
             _isCallAnswered = false;
             Nav.NavigateTo("/");
-        }
-
-        private void StopOverlay()
-        {
-#if ANDROID
-            var ctx = Android.App.Application.Context;
-            var stopIntent = new Intent(ctx, Class.FromType(typeof(CallOverlayService)));
-            ctx.StopService(stopIntent);
-#endif
         }
 
         public async void Dispose()
         {
             _callDurationTimer?.Stop();
             _ringingTimeoutTimer?.Stop();
-            //await JS.InvokeVoidAsync("stopRingingSound");
-            StopOverlay();
+#if ANDROID
+            MyInCallService.CallStateChanged -= OnCallStateChanged;
+#endif
         }
     }
 }

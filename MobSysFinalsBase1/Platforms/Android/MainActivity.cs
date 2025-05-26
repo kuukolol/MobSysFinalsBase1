@@ -1,101 +1,202 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Net;
 using Android.Provider;
 using Android.Telecom;
 using Android.Widget;
+using Android.Runtime;
+using Android.Util;
+using Java.Lang;
+using Microsoft.Maui.ApplicationModel;
+using System;
+using System.Threading.Tasks;
 using AndroidUri = Android.Net.Uri;
-using MobSysFinalsBase1.Platforms.Android.Services;
 
 namespace MobSysFinalsBase1
 {
-    [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+    [Activity(Theme = "@style/Maui.SplashTheme",
+              MainLauncher = true,
+              ConfigurationChanges = ConfigChanges.ScreenSize
+                                  | ConfigChanges.Orientation
+                                  | ConfigChanges.UiMode
+                                  | ConfigChanges.ScreenLayout
+                                  | ConfigChanges.SmallestScreenSize
+                                  | ConfigChanges.Density,
+              LaunchMode = LaunchMode.SingleTop)]
     public class MainActivity : MauiAppCompatActivity
     {
         const int REQUEST_OVERLAY_PERMISSION = 1234;
         const int REQUEST_DIALER_ROLE = 5678;
+        const int REQUEST_CALL_PHONE_PERMISSION = 5679;
+        const int REQUEST_CODE_SET_DEFAULT_DIALER = 4321;
+        const int CAPABILITY_CALL_PROVIDER = 0x00000002; 
+        const int CAPABILITY_SELF_MANAGED = 0x00001000; 
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            var telecomManager = (TelecomManager)GetSystemService(TelecomService);
-            System.Diagnostics.Debug.WriteLine("Default Dialer Package: " + telecomManager.DefaultDialerPackage);
-
             base.OnCreate(savedInstanceState);
-#if ANDROID
+            ProcessIntent(Intent);
+            RequestEssentialPermissionsAndRoles();
+        }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            base.OnNewIntent(intent);
+            ProcessIntent(intent);
+        }
+
+        void ProcessIntent(Intent intent)
+        {
+            if (intent?.GetBooleanExtra("NavigateToCallScreen", false) == true)
+            {
+                string phoneNumber = intent.GetStringExtra("PhoneNumber") ?? "Unknown";
+                string contactName = intent.GetStringExtra("ContactName") ?? "Unknown";
+                MainThread.BeginInvokeOnMainThread(async () =>
+                    await Shell.Current.GoToAsync(
+                        $"//call-screen/{System.Net.WebUtility.UrlEncode(phoneNumber)}/{System.Net.WebUtility.UrlEncode(contactName)}",
+                        true
+                    )
+                );
+            }
+            else if (intent?.GetBooleanExtra("CallEnded", false) == true)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (Shell.Current.CurrentState?.Location?.OriginalString?.Contains("call-screen") == true)
+                        await Shell.Current.GoToAsync("..", true);
+                });
+            }
+        }
+
+        void RequestEssentialPermissionsAndRoles()
+        {
             if (!Settings.CanDrawOverlays(this))
             {
-                var overlayIntent = new Intent(Settings.ActionManageOverlayPermission, AndroidUri.Parse($"package:{PackageName}"));
+                var overlayIntent = new Intent(
+                    Settings.ActionManageOverlayPermission,
+                    AndroidUri.Parse($"package:{PackageName}")
+                );
                 StartActivityForResult(overlayIntent, REQUEST_OVERLAY_PERMISSION);
+                return;
             }
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Q)
+
+            if (CheckSelfPermission(Manifest.Permission.CallPhone) != Permission.Granted)
             {
-                var roleManagerObj = GetSystemService("role");
-                if (roleManagerObj != null)
-                {
-                    dynamic roleManager = roleManagerObj;
-                    string roleDialer = "android.app.role.DIALER";
-                    bool isHeld = roleManager.IsRoleHeld(roleDialer);
-                    if (!isHeld)
-                    {
-                        Intent roleRequestIntent = roleManager.CreateRequestRoleIntent(roleDialer);
-                        StartActivityForResult(roleRequestIntent, REQUEST_DIALER_ROLE);
-                    }
-                }
+                RequestPermissions(
+                    new[] { Manifest.Permission.CallPhone },
+                    REQUEST_CALL_PHONE_PERMISSION
+                );
+                return;
+            }
+
+            _ = AttemptToSetDefaultDialer();
+        }
+
+        async Task AttemptToSetDefaultDialer()
+        {
+            var tm = (TelecomManager)GetSystemService(Context.TelecomService);
+            if (tm == null) return;
+
+            if (!PackageName.Equals(tm.DefaultDialerPackage))
+            {
+                var intent = new Intent(TelecomManager.ActionChangeDefaultDialer);
+                intent.PutExtra(TelecomManager.ExtraChangeDefaultDialerPackageName, PackageName);
+                StartActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER);
+                Toast.MakeText(this, "enabled", ToastLength.Short);
             }
             else
             {
-                var telecomManagerFallback = (TelecomManager)GetSystemService(TelecomService);
-                if (telecomManagerFallback != null && !PackageName.Equals(telecomManagerFallback.DefaultDialerPackage))
-                {
-                    var dialerIntent = new Intent(TelecomManager.ActionChangeDefaultDialer);
-                    dialerIntent.PutExtra(TelecomManager.ExtraChangeDefaultDialerPackageName, PackageName);
-                    StartActivityForResult(dialerIntent, REQUEST_DIALER_ROLE);
-                }
+                RegisterPhoneAccountIfDefaultDialer();
+                Toast.MakeText(this, "not enabled", ToastLength.Short);
+
             }
-            RegisterPhoneAccountIfDefaultDialer();
-#endif
         }
-#if ANDROID
-        void RegisterPhoneAccountIfDefaultDialer()
+
+        public override void OnRequestPermissionsResult(
+            int requestCode,
+            string[] permissions,
+            [GeneratedEnum] Permission[] grantResults
+        )
         {
-            var telecomManager = (TelecomManager)GetSystemService(TelecomService);
-            if (telecomManager != null && PackageName.Equals(telecomManager.DefaultDialerPackage))
+            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            if (requestCode == REQUEST_CALL_PHONE_PERMISSION &&
+                grantResults.Length > 0 &&
+                grantResults[0] == Permission.Granted)
             {
-                var componentName = new ComponentName(PackageName, typeof(MyConnectionService).FullName);
-                var phoneAccountHandle = new PhoneAccountHandle(componentName, "MyDialer");
-                var builder = new PhoneAccount.Builder(phoneAccountHandle, "My Dialer App");
-                builder.SetCapabilities(1);
-                PhoneAccount phoneAccount = builder.Build();
-                telecomManager.RegisterPhoneAccount(phoneAccount);
+                _ = AttemptToSetDefaultDialer();
+            }
+            else if (requestCode == REQUEST_CALL_PHONE_PERMISSION)
+            {
+                Toast.MakeText(
+                    this,
+                    "Call Phone permission is required for this app to function as a dialer.",
+                    ToastLength.Long
+                ).Show();
             }
         }
-#endif
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+
+        protected override void OnActivityResult(
+            int requestCode,
+            [GeneratedEnum] Result resultCode,
+            Intent data
+        )
         {
             base.OnActivityResult(requestCode, resultCode, data);
-#if ANDROID
+
             if (requestCode == REQUEST_OVERLAY_PERMISSION)
             {
-                if (!Settings.CanDrawOverlays(this))
-                {
-                    Toast.MakeText(this, "Overlay permission not granted.", ToastLength.Long).Show();
-                }
+                if (Settings.CanDrawOverlays(this))
+                    RequestEssentialPermissionsAndRoles();
+                else
+                    Toast.MakeText(
+                        this,
+                        "Overlay permission is needed for call UI.",
+                        ToastLength.Long
+                    ).Show();
             }
             else if (requestCode == REQUEST_DIALER_ROLE)
             {
-                var telecomManager = (TelecomManager)GetSystemService(TelecomService);
-                if (telecomManager != null && PackageName.Equals(telecomManager.DefaultDialerPackage))
+                var tm = (TelecomManager)GetSystemService(Context.TelecomService);
+                if (tm != null && PackageName.Equals(tm.DefaultDialerPackage))
                 {
-                    RegisterPhoneAccountIfDefaultDialer();
                     Toast.MakeText(this, "Dialer role granted.", ToastLength.Long).Show();
+                    RegisterPhoneAccountIfDefaultDialer();
                 }
                 else
                 {
-                    Toast.MakeText(this, "Dialer role not granted.", ToastLength.Long).Show();
+                    Toast.MakeText(this, tm.DefaultDialerPackage, ToastLength.Long).Show();
+                    RegisterPhoneAccountIfDefaultDialer();
                 }
             }
-#endif
+        }
+
+        void RegisterPhoneAccountIfDefaultDialer()
+        {
+            var tm = (TelecomManager)GetSystemService(Context.TelecomService);
+            if (tm == null ||
+                !PackageName.Equals(tm.DefaultDialerPackage) ||
+                CheckSelfPermission(Manifest.Permission.CallPhone) != Permission.Granted)
+                return;
+
+            var component = new ComponentName(this, Java.Lang.Class.FromType(typeof(MobSysFinalsBase1.Platforms.Android.Services.MyConnectionService)));
+            var handle = new PhoneAccountHandle(component, "MyDialer");
+            var builder = new PhoneAccount.Builder(handle, "My Dialer App");
+            builder.SetCapabilities(CAPABILITY_CALL_PROVIDER);
+            builder.AddSupportedUriScheme(PhoneAccount.SchemeTel);
+            var account = builder.Build();
+
+            try
+            {
+                tm.RegisterPhoneAccount(account);
+            }
+            catch (System.Exception ex)
+            {
+                Log.Error("MainActivity", ex.Message);
+            }
         }
     }
 }

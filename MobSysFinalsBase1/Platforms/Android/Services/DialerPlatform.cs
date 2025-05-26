@@ -1,6 +1,10 @@
 ﻿using Android.Content;
 using Android.OS;
 using Android.Telecom;
+using Android;
+using Android.Content.PM;
+using Microsoft.Maui.ApplicationModel;
+using AndroidX.Core.Content;
 using MobSysFinalsBase1.Shared;
 
 namespace MobSysFinalsBase1.Platforms.Android
@@ -15,7 +19,18 @@ namespace MobSysFinalsBase1.Platforms.Android
             {
                 var uri = global::Android.Net.Uri.Parse($"tel:{phoneNumber}");
                 var extras = new Bundle();
-                telecomManager.PlaceCall(uri, extras);
+                var componentName = new ComponentName(context, Java.Lang.Class.FromType(typeof(Services.MyConnectionService)).Name);
+                var phoneAccountHandle = new PhoneAccountHandle(componentName, "MyDialer");
+                extras.PutParcelable(TelecomManager.ExtraPhoneAccountHandle, phoneAccountHandle);
+
+                if (context.CheckSelfPermission(Manifest.Permission.CallPhone) == PermissionChecker.PermissionGranted)
+                {
+                    telecomManager.PlaceCall(uri, extras);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("CALL_PHONE permission not granted.");
+                }
             }
         }
     }
