@@ -58,6 +58,13 @@ namespace MyContact.Components.Pages
                 Nav.NavigateTo("/", false);
                 Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
             }
+            else if (uri.Query.Contains("success=true&mode=delete"))
+            {
+                Debug.WriteLine("[Home] success=true query parameter detected.");
+                ShowToastMessage("Contact deleted successfully! 🎉");
+                Nav.NavigateTo("/", false);
+                Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
+            }
             else
             {
                 Debug.WriteLine("[Home] No success=true query parameter found in URI.");

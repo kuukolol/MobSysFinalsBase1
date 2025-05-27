@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace MyContact.Components.Pages
 {
@@ -30,22 +32,79 @@ namespace MyContact.Components.Pages
         protected string UploadErrorMessage { get; set; } = string.Empty;
         protected string DatabaseErrorMessage { get; set; } = string.Empty;
 
+        protected List<Country> Countries { get; set; } = new();
+        protected Country SelectedCountry { get; set; }
+        protected bool ShowCountryDropdown { get; set; } = false;
+        protected string PhoneNumberInput { get; set; } = string.Empty;
+        protected string CountrySearch { get; set; } = string.Empty;
+        protected ElementReference DropdownElement;
+
         protected override async Task OnInitializedAsync()
         {
-            if (DB != null)
-            {
-                await DB.Init();
-                await LoadContact();
-            }
+            Countries = CountryData.GetCountries();
+            await LoadContact();
         }
 
         private async Task LoadContact()
         {
             if (DB != null)
             {
+                await DB.Init();
                 var users = await DB.Users();
                 Contact = users.FirstOrDefault(u => u.ID == ContactId);
+
+                if (Contact != null)
+                {
+                    PhoneNumberInput = Contact.PhoneNumber;
+                    string dialCode = "+" + (Contact.CountryCode ?? "63");
+                    SelectedCountry = Countries.FirstOrDefault(c => c.DialCode == dialCode) ?? Countries.FirstOrDefault(c => c.DialCode == "+63");
+                }
+                else
+                {
+                    SelectedCountry = Countries.FirstOrDefault(c => c.DialCode == "+63");
+                }
+
                 StateHasChanged();
+            }
+        }
+
+        protected IEnumerable<Country> FilteredCountries =>
+            string.IsNullOrWhiteSpace(CountrySearch)
+                ? Countries
+                : Countries.Where(c =>
+                    c.Name.StartsWith(CountrySearch, StringComparison.OrdinalIgnoreCase) ||
+                    c.Code.StartsWith(CountrySearch, StringComparison.OrdinalIgnoreCase) ||
+                    c.DialCode.Contains(CountrySearch));
+
+        protected List<Country> FilteredCountriesList =>
+            FilteredCountries.ToList();
+
+        protected async Task HandleKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter" && FilteredCountries.Any())
+            {
+                SelectCountry(FilteredCountries.First());
+                return;
+            }
+            else if (e.Key == "Escape")
+            {
+                ShowCountryDropdown = false;
+                CountrySearch = string.Empty;
+                StateHasChanged();
+                return;
+            }
+            else if (e.Key.Length == 1 && char.IsLetterOrDigit(e.Key[0]))
+            {
+                CountrySearch += e.Key;
+                StateHasChanged();
+            }
+            else if (e.Key == "Backspace")
+            {
+                if (CountrySearch.Length > 0)
+                {
+                    CountrySearch = CountrySearch.Substring(0, CountrySearch.Length - 1);
+                    StateHasChanged();
+                }
             }
         }
 
@@ -68,6 +127,17 @@ namespace MyContact.Components.Pages
                 }
 
                 Contact.ProfilePicture = filePath;
+
+                if (SelectedCountry != null && !string.IsNullOrWhiteSpace(PhoneNumberInput))
+                {
+                    Contact.CountryCode = SelectedCountry.DialCode.Replace("+", "");
+                    Contact.PhoneNumber = PhoneNumberInput.TrimStart('0');
+                }
+                else
+                {
+                    Contact.CountryCode = string.Empty;
+                    Contact.PhoneNumber = PhoneNumberInput;
+                }
 
                 if (DatabaseContext.Instance == null)
                 {
@@ -170,6 +240,24 @@ namespace MyContact.Components.Pages
             }
         }
 
+        protected void ToggleCountryDropdown()
+        {
+            ShowCountryDropdown = !ShowCountryDropdown;
+            if (ShowCountryDropdown)
+            {
+                CountrySearch = string.Empty;
+            }
+            StateHasChanged();
+        }
+
+        protected void SelectCountry(Country country)
+        {
+            SelectedCountry = country;
+            ShowCountryDropdown = false;
+            CountrySearch = string.Empty;
+            StateHasChanged();
+        }
+
         private string DisplayName(User user)
         {
             if (user == null) return "Unknown";
@@ -190,7 +278,7 @@ namespace MyContact.Components.Pages
                 : "?";
         }
 
-        private string GetImageSrc(string filePath)
+        protected string GetImageSrc(string filePath)
         {
             if (filePath.StartsWith("data:image/"))
                 return filePath;
