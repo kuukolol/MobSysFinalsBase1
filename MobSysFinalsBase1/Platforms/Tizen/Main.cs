@@ -2,7 +2,7 @@ using System;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     internal class Program : MauiApplication
     {

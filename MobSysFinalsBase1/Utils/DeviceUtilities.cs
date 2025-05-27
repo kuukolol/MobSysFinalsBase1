@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MobSysFinalsBase1.Utils
+namespace MyContact.Utils
 {
     /// <summary>
     /// Shared Class to access Camera, Photo Picker, and etc.

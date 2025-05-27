@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

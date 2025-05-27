@@ -1,4 +1,4 @@
-﻿using MobSysFinalsBase1.Models;
+﻿using MyContact.Models;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MobSysFinalsBase1.Shared
+namespace MyContact.Shared
 {
     /// <summary>
     /// Centralized Class for handing local SQLite Database things for the App

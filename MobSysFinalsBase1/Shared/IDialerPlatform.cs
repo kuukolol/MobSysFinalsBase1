@@ -1,4 +1,4 @@
-﻿namespace MobSysFinalsBase1.Shared
+﻿namespace MyContact.Shared
 {
     public interface IDialerPlatform
     {

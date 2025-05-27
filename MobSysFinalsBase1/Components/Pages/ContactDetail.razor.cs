@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
-using MobSysFinalsBase1.Models;
-using MobSysFinalsBase1.Shared;
+using MyContact.Models;
+using MyContact.Shared;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class ContactDetail : ComponentBase
     {
@@ -25,11 +24,8 @@ namespace MobSysFinalsBase1.Components.Pages
         protected bool ShowToast { get; set; }
         protected string ToastMessage { get; set; }
 
-        protected string StarIconClass =>
-            IsFavorite ? "fas fa-star" : "far fa-star";
-
-        protected string StarColorClass =>
-            IsFavorite ? "text-yellow-300" : "text-black-800";
+        protected string StarIconClass => IsFavorite ? "fas fa-star" : "far fa-star";
+        protected string StarColorClass => IsFavorite ? "text-yellow-300" : "text-black-800";
 
         protected override async Task OnInitializedAsync()
         {
@@ -68,23 +64,23 @@ namespace MobSysFinalsBase1.Components.Pages
                 await ShowToastMessage("No phone number available to call.");
                 return;
             }
-            try
+            var fullNumber = DialerService.GetFullInternationalNumber(Contact.PhoneNumber, Contact.CountryCode);
+
+            await ShowToastMessage($"Dialing: {fullNumber}");
+
+            var status = await Permissions.RequestAsync<Permissions.Phone>();
+            if (status != PermissionStatus.Granted)
             {
-                string contactName = Uri.EscapeDataString(DisplayName(Contact));
-                string fullNumber = !string.IsNullOrWhiteSpace(Contact.CountryCode) ? $"{Contact.CountryCode}{Contact.PhoneNumber}" : Contact.PhoneNumber;
-                Nav.NavigateTo($"/call-screen/{fullNumber}/{contactName}");
+                await ShowToastMessage("Phone permission not granted.");
+                return;
             }
-            catch (Exception ex)
-            {
-                await ShowToastMessage($"Error navigating to call screen: {ex.Message}");
-                Debug.WriteLine($"[ContactDetail] Error navigating to call screen: {ex.Message}");
-            }
+
+            DialerService.CallDirect(fullNumber);
         }
 
         private async Task ToggleFavorite()
         {
             if (Contact == null) return;
-
             IsFavorite = !IsFavorite;
             Contact.Favourites = IsFavorite;
             await DB.SaveUser(Contact);
@@ -104,9 +100,7 @@ namespace MobSysFinalsBase1.Components.Pages
         private string GetInitial(User user)
         {
             var name = DisplayName(user);
-            return !string.IsNullOrEmpty(name)
-                ? name.Substring(0, 1).ToUpper()
-                : "?";
+            return !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "?";
         }
 
         private string DisplayName(User user)
