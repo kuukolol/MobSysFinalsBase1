@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
-using MobSysFinalsBase1.Services; 
-using MobSysFinalsBase1.Shared;  
+using MyContact.Services; 
+using MyContact.Shared;  
 
 #if ANDROID
 
-using MobSysFinalsBase1.Platforms.Android; // For DialerPlatform
+using MyContact.Platforms.Android; // For DialerPlatform
 
 #endif
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     public static class MauiProgram
     {
@@ -35,6 +35,9 @@ namespace MobSysFinalsBase1
             builder.Services.AddSingleton<IDialerPlatform, DialerPlatform>();
 #else
             builder.Services.AddSingleton<IDialerPlatform>(sp => new DefaultDialerPlatform());
+#endif
+#if ANDROID
+    builder.Services.AddSingleton<IDefaultDialerService, MyContact.Platforms.Android.DefaultDialerService>();
 #endif
             return builder.Build();
         }

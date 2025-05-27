@@ -14,7 +14,7 @@ using System;
 using System.Threading.Tasks;
 using AndroidUri = Android.Net.Uri;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     [Activity(Theme = "@style/Maui.SplashTheme",
               MainLauncher = true,
@@ -182,7 +182,7 @@ namespace MobSysFinalsBase1
                 CheckSelfPermission(Manifest.Permission.CallPhone) != Permission.Granted)
                 return;
 
-            var component = new ComponentName(this, Java.Lang.Class.FromType(typeof(MobSysFinalsBase1.Platforms.Android.Services.MyConnectionService)));
+            var component = new ComponentName(this, Java.Lang.Class.FromType(typeof(MyContact.Platforms.Android.Services.MyConnectionService)));
             var handle = new PhoneAccountHandle(component, "MyDialer");
             var builder = new PhoneAccount.Builder(handle, "My Dialer App");
             builder.SetCapabilities(CAPABILITY_CALL_PROVIDER);

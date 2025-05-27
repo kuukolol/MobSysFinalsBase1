@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
-using MobSysFinalsBase1.Models;
-using MobSysFinalsBase1.Shared;
+using MyContact.Models;
+using MyContact.Shared;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class ContactDetail : ComponentBase
     {

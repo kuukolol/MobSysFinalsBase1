@@ -1,0 +1,46 @@
+﻿@page "/settings"
+
+@inject MyContact.Services.IDefaultDialerService DefaultDialerService
+
+<h3>Settings</h3>
+
+<button class="btnsubmit" @onclick="RequestDefaultDialerAsync">Make Default Phone App</button>
+<style>
+    .btnsubmit {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 16px;
+        transition: background 0.2s;
+    }
+
+        .btnsubmit:hover, .btnsubmit:focus {
+            background-color: #388e3c;
+            outline: none;
+        }
+</style>
+@if (!string.IsNullOrEmpty(StatusMessage))
+{
+    <p>@StatusMessage</p>
+}
+
+@code {
+    string StatusMessage;
+
+    async Task RequestDefaultDialerAsync()
+    {
+        try
+        {
+            var result = await DefaultDialerService.RequestDefaultDialerAsync();
+            StatusMessage = result ? "Prompt shown to user." : "Could not launch prompt.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
+    }
+}

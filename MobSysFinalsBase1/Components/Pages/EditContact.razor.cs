@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using MobSysFinalsBase1.Models;
-using MobSysFinalsBase1.Shared;
+using Microsoft.JSInterop;
+using MyContact.Models;
+using MyContact.Shared;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class EditContact : ComponentBase
     {
@@ -21,6 +22,9 @@ namespace MobSysFinalsBase1.Components.Pages
         [Inject]
         public DatabaseContext DB { get; set; }
 
+        [Inject]
+        public IJSRuntime JSRuntime { get; set; }
+
         protected User Contact { get; set; } = new User();
         protected string SelectedImagePath { get; set; } = string.Empty;
         protected string UploadErrorMessage { get; set; } = string.Empty;
@@ -28,11 +32,9 @@ namespace MobSysFinalsBase1.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            Debug.WriteLine("[EditContact] OnInitializedAsync started.");
             if (DB != null)
             {
                 await DB.Init();
-                Debug.WriteLine("[EditContact] Database initialized.");
                 await LoadContact();
             }
         }
@@ -43,7 +45,6 @@ namespace MobSysFinalsBase1.Components.Pages
             {
                 var users = await DB.Users();
                 Contact = users.FirstOrDefault(u => u.ID == ContactId);
-                Debug.WriteLine($"[EditContact] Contact loaded: ID={ContactId}, Name={DisplayName(Contact)}");
                 StateHasChanged();
             }
         }
@@ -96,13 +97,11 @@ namespace MobSysFinalsBase1.Components.Pages
                     await DatabaseContext.Instance.SaveUser(Contact);
                 }
 
-                Debug.WriteLine("[EditContact] Contact updated successfully. Navigating to Home with success=true parameter.");
                 NavigationManager.NavigateTo("/?success=true&mode=edit");
             }
             catch (Exception ex)
             {
                 DatabaseErrorMessage = $"Error updating contact: {ex.Message}";
-                Debug.WriteLine($"[EditContact] Error updating contact: {ex.Message}");
             }
         }
 
@@ -125,24 +124,51 @@ namespace MobSysFinalsBase1.Components.Pages
                         await file.OpenReadStream().CopyToAsync(fs);
                         SelectedImagePath = uniqueFileName;
                         UploadErrorMessage = string.Empty;
-                        Debug.WriteLine($"[EditContact] File uploaded: {uniqueFileName}");
                     }
                     else
                     {
                         UploadErrorMessage = "Unsupported file type. Only JPG, PNG, and JPEG are allowed.";
                         SelectedImagePath = string.Empty;
-                        Debug.WriteLine("[EditContact] Unsupported file type uploaded.");
                     }
                 }
             }
             catch (Exception ex)
             {
                 UploadErrorMessage = $"Error uploading file: {ex.Message}";
-                Debug.WriteLine($"[EditContact] Error uploading file: {ex.Message}");
             }
         }
 
         protected void Cancel() => NavigationManager.NavigateTo($"/contact/{ContactId}");
+
+        protected async Task DeleteContact()
+        {
+            try
+            {
+                bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this contact?");
+                if (!confirmed)
+                    return;
+
+                if (Contact == null || Contact.ID == 0)
+                {
+                    DatabaseErrorMessage = "No contact loaded to delete.";
+                    return;
+                }
+
+                if (DatabaseContext.Instance == null)
+                {
+                    DatabaseErrorMessage = "Database service is not initialized. Please restart the app.";
+                    return;
+                }
+
+                await DatabaseContext.Instance.DeleteUser(Contact);
+                NavigationManager.NavigateTo("/?success=true&mode=delete");
+
+            }
+            catch (Exception ex)
+            {
+                DatabaseErrorMessage = $"Error deleting contact: {ex.Message}";
+            }
+        }
 
         private string DisplayName(User user)
         {
@@ -180,9 +206,8 @@ namespace MobSysFinalsBase1.Components.Pages
                     string mimeType = extension == ".svg" ? "image/svg+xml" : (extension == ".png" ? "image/png" : "image/jpeg");
                     return $"data:{mimeType};base64,{base64String}";
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Error converting file to base64: {ex.Message}");
                     Random rand = new Random();
                     int avatarNum = rand.Next(1, 5);
                     return $"images/default_avatar_{avatarNum}.jpg";

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using MobSysFinalsBase1.Shared;
-using MobSysFinalsBase1.Models;
+using MyContact.Shared;
+using MyContact.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class Home : ComponentBase
     {
@@ -55,6 +55,13 @@ namespace MobSysFinalsBase1.Components.Pages
             {
                 Debug.WriteLine("[Home] success=true query parameter detected.");
                 ShowToastMessage("Contact updated successfully! 🎉");
+                Nav.NavigateTo("/", false);
+                Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
+            }
+            else if (uri.Query.Contains("success=true&mode=delete"))
+            {
+                Debug.WriteLine("[Home] success=true query parameter detected.");
+                ShowToastMessage("Contact deleted successfully! 🎉");
                 Nav.NavigateTo("/", false);
                 Debug.WriteLine("[Home] Navigated to '/' to clear query parameter.");
             }

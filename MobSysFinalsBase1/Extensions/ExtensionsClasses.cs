@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MobSysFinalsBase1.Extensions
+namespace MyContact.Extensions
 {
     /// <summary>
     /// Meant for MAUI Blazor Only

@@ -5,9 +5,9 @@ using Android;
 using Android.Content.PM;
 using Microsoft.Maui.ApplicationModel;
 using AndroidX.Core.Content;
-using MobSysFinalsBase1.Shared;
+using MyContact.Shared;
 
-namespace MobSysFinalsBase1.Platforms.Android
+namespace MyContact.Platforms.Android
 {
     public class DialerPlatform : IDialerPlatform
     {

@@ -5,7 +5,7 @@ using Android.Views;
 using Android.Graphics;
 using View = Android.Views.View;
 
-namespace MobSysFinalsBase1.Platforms.Android.Services
+namespace MyContact.Platforms.Android.Services
 {
     [Service]
     public class CallOverlayService : Service

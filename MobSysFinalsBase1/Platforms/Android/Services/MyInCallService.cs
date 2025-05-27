@@ -6,7 +6,7 @@ using Android.Media;
 using Android.Runtime;
 using Android.Net;
 
-namespace MobSysFinalsBase1.Platforms.Android.Services
+namespace MyContact.Platforms.Android.Services
 {
     [Service(Name = "com.companyname.mobsysfinalsbase1.MyInCallService",
              Permission = global::Android.Manifest.Permission.BindIncallService,

@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System;
 
-namespace MobSysFinalsBase1.Models
+namespace MyContact.Models
 {
     public class User
     {

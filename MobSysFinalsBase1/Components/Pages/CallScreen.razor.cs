@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using MobSysFinalsBase1.Shared;
+using MyContact.Shared;
 using System;
 using System.Threading.Tasks;
 using System.Timers;
@@ -8,11 +8,11 @@ using System.Timers;
 using Android.App;
 using Android.Content;
 using Java.Lang;
-using MobSysFinalsBase1.Platforms.Android.Services;
+using MyContact.Platforms.Android.Services;
 using Android.Telecom;
 #endif
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class CallScreen : ComponentBase, IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     [Application]
     public class MainApplication : MauiApplication

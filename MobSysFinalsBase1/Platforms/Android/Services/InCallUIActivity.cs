@@ -5,7 +5,7 @@ using Android.OS;
 using Android.Views;
 using AndroidX.AppCompat.App;
 
-namespace MobSysFinalsBase1.Platforms.Android.Services
+namespace MyContact.Platforms.Android.Services
 {
     [Activity(Label = "InCallUIActivity",
               Theme = "@style/Maui.SplashTheme",

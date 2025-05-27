@@ -1,4 +1,4 @@
-﻿namespace MobSysFinalsBase1
+﻿namespace MyContact
 {
     public partial class App : Application
     {

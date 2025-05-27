@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Telecom;
 using Android.Telephony;
 
-namespace MobSysFinalsBase1.Platforms.Android.Services
+namespace MyContact.Platforms.Android.Services
 {
     [Service(
         Exported = true,

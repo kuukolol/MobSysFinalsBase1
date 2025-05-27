@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
-using MobSysFinalsBase1.Models;
-using MobSysFinalsBase1.Shared;
+using MyContact.Models;
+using MyContact.Shared;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace MobSysFinalsBase1.Components.Pages
+namespace MyContact.Components.Pages
 {
     public partial class AddContact : ComponentBase
     {

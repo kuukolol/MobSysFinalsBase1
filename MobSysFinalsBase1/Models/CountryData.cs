@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MobSysFinalsBase1.Shared
+namespace MyContact.Shared
 {
     public class Country
     {

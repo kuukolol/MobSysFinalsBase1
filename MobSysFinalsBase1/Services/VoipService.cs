@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace MobSysFinalsBase1.Services
+namespace MyContact.Services
 {
     public class VoipService
     {

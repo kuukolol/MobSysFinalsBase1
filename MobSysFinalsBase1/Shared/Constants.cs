@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MobSysFinalsBase1.Shared
+namespace MyContact.Shared
 {
     /// <summary>
     /// Centralized Class for global constants (unchangable values)

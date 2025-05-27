@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     public class Program
     {

@@ -2,7 +2,7 @@
 using Android.Content.PM;
 using Android.OS;
 
-namespace MobSysFinalsBase1
+namespace MyContact
 {
     [Activity(Label = "My Dialer", Exported = true, LaunchMode = LaunchMode.SingleTask)]
     public class DialerActivity : Activity

@@ -4,7 +4,7 @@ using Android.OS;
 using Android.Telecom;
 using Microsoft.Maui.ApplicationModel;
 
-namespace MobSysFinalsBase1.Platforms.Android.Services
+namespace MyContact.Platforms.Android.Services
 {
     public class CustomDialerService
     {
